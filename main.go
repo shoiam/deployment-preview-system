@@ -26,7 +26,7 @@ func handleWebhook(c *gin.Context) {
 		log.Fatal("Unable to read request data.")
 	}
 	// fmt.Printf("Data coming from the request: %v", string(requestData))
-	fmt.Printf("JSON form of the request payload: %v\n", payload)
+	fmt.Printf("JSON form of the request payload: %v\n", payload.Ref)
 }
 
 func main() {
