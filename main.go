@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -10,14 +11,22 @@ import (
 	"golang.ngrok.com/ngrok/v2"
 )
 
+type WebhookPayload struct {
+	Ref string `json:"ref"`
+}
+
 func handleWebhook(c *gin.Context) {
 	fmt.Println("I am in the handleWebhook")
 	data := c.Request.Body
 	requestData, err := io.ReadAll(data)
+	var payload WebhookPayload
+	json.Unmarshal(requestData, &payload)
+
 	if err != nil {
 		log.Fatal("Unable to read request data.")
 	}
-	fmt.Printf("Data coming from the request: %v", string(requestData))
+	// fmt.Printf("Data coming from the request: %v", string(requestData))
+	fmt.Printf("JSON form of the request Data: %v\n", payload)
 }
 
 func main() {
