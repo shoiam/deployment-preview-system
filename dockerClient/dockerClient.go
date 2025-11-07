@@ -19,10 +19,14 @@ func ClientElement() {
 
 	if containerErr != nil {
 		panic(containerErr)
+	} else {
+		fmt.Println("Continer fetch successful")
 	}
 
 	if imageErr != nil {
 		panic(imageErr)
+	} else {
+		fmt.Println("Image fetch successful")
 	}
 
 	for _, ctr := range containers.Items {
