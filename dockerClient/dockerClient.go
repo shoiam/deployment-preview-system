@@ -28,12 +28,16 @@ func ClientElement() {
 	} else {
 		fmt.Println("Image fetch successful")
 	}
-
+	i := 1
 	for _, ctr := range containers.Items {
+		fmt.Printf("Container %d\n", i)
 		fmt.Printf("%s %s (status: %s)\n", ctr.ID, ctr.Image, ctr.Status)
+		i += 1
 	}
-
+	j := 1
 	for _, image := range images.Items {
+		fmt.Printf("Image %d\n", j)
 		fmt.Printf("%s %s (status: %s)\n", image.ID, image.ParentID, image.Labels[image.Descriptor.Digest.Algorithm().String()])
+		j += 1
 	}
 }
