@@ -4,40 +4,41 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/moby/moby/client"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/client"
+	"github.com/docker/go-connections/nat"
 )
 
-func ClientElement() {
-	apiClient, err := client.New(client.FromEnv, client.WithAPIVersionNegotiation())
+func ClientElement(branch string) (string, error) {
+	apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	defer apiClient.Close()
 
-	containers, containerErr := apiClient.ContainerList(context.Background(), client.ContainerListOptions{})
-	images, imageErr := apiClient.ImageList(context.Background(), client.ImageListOptions{All: true})
+	ctx := context.Background()
 
-	if containerErr != nil {
-		panic(containerErr)
-	} else {
-		fmt.Println("Continer fetch successful")
-	}
+	containerName := "preview-" + branch
 
-	if imageErr != nil {
-		panic(imageErr)
-	} else {
-		fmt.Println("Image fetch successful")
+	resp, err := apiClient.ContainerCreate(ctx, &container.Config{
+		Image: "nginx:alpine",
+		ExposedPorts: nat.PortSet{
+			"80/tcp": struct{}{},
+		},
+	}, &container.HostConfig{
+		PortBindings: nat.PortMap{
+			"80/tcp": []nat.PortBinding{{HostPort: "0"}},
+		},
+	}, nil, nil, containerName)
+
+	if err != nil {
+		return "", err
 	}
-	i := 1
-	for _, ctr := range containers.Items {
-		fmt.Printf("Container %d\n", i)
-		fmt.Printf("%s %s (status: %s)\n", ctr.ID, ctr.Image, ctr.Status)
-		i += 1
+	if err := apiClient.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
+		return "", err
 	}
-	j := 1
-	for _, image := range images.Items {
-		fmt.Printf("Image %d\n", j)
-		fmt.Printf("%s %s %s\n", image.ID, image.ParentID, image.RepoTags)
-		j += 1
-	}
+	inspect, _ := apiClient.ContainerInspect(ctx, resp.ID)
+	port := inspect.NetworkSettings.Ports["80/tcp"][0].HostPort
+
+	return fmt.Sprintf("http://localhost:%s", port), nil
 }

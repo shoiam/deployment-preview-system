@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shoiam/deployment-preview-system.git/dockerClient"
@@ -27,7 +28,18 @@ func handleWebhook(c *gin.Context) {
 		log.Fatal("Unable to read request data.")
 	}
 	fmt.Printf("JSON form of the request payload: %v\n", payload.Ref)
-	dockerClient.ClientElement()
+	branchName := strings.TrimPrefix(payload.Ref, "refs/heads/")
+	previewURL, err := dockerClient.ClientElement(branchName)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"status":      "created",
+		"branch":      branchName,
+		"preview_url": previewURL,
+	})
 }
 
 func main() {
