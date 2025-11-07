@@ -8,7 +8,7 @@ import (
 )
 
 func ClientElement() {
-	apiClient, err := client.New(client.FromEnv)
+	apiClient, err := client.New(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		panic(err)
 	}
