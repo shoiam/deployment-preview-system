@@ -37,7 +37,7 @@ func ClientElement() {
 	j := 1
 	for _, image := range images.Items {
 		fmt.Printf("Image %d\n", j)
-		fmt.Printf("%s %s (status: %s)\n", image.ID, image.ParentID, image.Labels[image.Descriptor.Digest.Algorithm().String()])
+		fmt.Printf("%s %s %s\n", image.ID, image.ParentID, image.RepoTags)
 		j += 1
 	}
 }
