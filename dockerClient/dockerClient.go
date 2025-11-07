@@ -18,7 +18,7 @@ func ClientElement(branch string) (string, error) {
 
 	ctx := context.Background()
 
-	containerName := "preview-" + branch
+	containerName := "preview-app-" + branch
 
 	resp, err := apiClient.ContainerCreate(ctx, &container.Config{
 		Image: "nginx:alpine",
