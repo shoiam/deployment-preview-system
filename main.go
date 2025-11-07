@@ -42,6 +42,20 @@ func handleWebhook(c *gin.Context) {
 	})
 }
 
+func getPreviews(c *gin.Context) {
+	containers, err := dockerClient.GetPreviews()
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"containers": containers,
+		"count":      len(containers),
+	})
+}
+
 func main() {
 	ginClient := gin.Default()
 	ctx := context.Background()
@@ -54,5 +68,6 @@ func main() {
 	fmt.Printf("App public URL is: %v\n", newNgClient.URL())
 
 	ginClient.POST("/webhook", handleWebhook)
+	ginClient.GET("/previews", getPreviews)
 	ginClient.RunListener(newNgClient)
 }

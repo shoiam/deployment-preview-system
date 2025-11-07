@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -17,6 +18,22 @@ func cleanUpPreview(branch string) error {
 	cleanApi.ContainerStop(ctx, containerName, container.StopOptions{})
 	cleanApi.ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true})
 	return nil
+}
+
+func GetPreviews() ([]types.Container, error) {
+	ctx := context.Background()
+	apiClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+
+	if err != nil {
+		return nil, err
+	}
+
+	containers, err := apiClient.ContainerList(ctx, container.ListOptions{All: true})
+	if err != nil {
+		return nil, err
+	}
+
+	return containers, nil
 }
 
 func ClientElement(branch string) (string, error) {
