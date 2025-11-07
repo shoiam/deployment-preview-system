@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shoiam/deployment-preview-system.git/dockerClient"
 	"golang.ngrok.com/ngrok/v2"
 )
 
@@ -25,8 +26,8 @@ func handleWebhook(c *gin.Context) {
 	if err != nil {
 		log.Fatal("Unable to read request data.")
 	}
-	// fmt.Printf("Data coming from the request: %v", string(requestData))
 	fmt.Printf("JSON form of the request payload: %v\n", payload.Ref)
+	dockerClient.ClientElement()
 }
 
 func main() {
@@ -41,8 +42,5 @@ func main() {
 	fmt.Printf("App public URL is: %v\n", newNgClient.URL())
 
 	ginClient.POST("/webhook", handleWebhook)
-	// http.Serve(newNgClient, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 	fmt.Fprintln(w, "Hello from ngrok-delivered Go app.")
-	// }))
 	ginClient.RunListener(newNgClient)
 }
